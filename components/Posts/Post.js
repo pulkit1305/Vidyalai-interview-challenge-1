@@ -110,7 +110,7 @@ const Post = ({ post }) => {
 
   const handleNextClick = () => {
     if (carouselRef.current) {
-      const scrollAmount = carouselRef.current.offsetWidth; // Scroll half the width of the carousel to show the next image
+      const scrollAmount = carouselRef.current.offsetWidth; 
       carouselRef.current.scrollBy({
         left: scrollAmount,
         behavior: 'smooth',
@@ -120,7 +120,7 @@ const Post = ({ post }) => {
 
   const handlePrevClick = () => {
     if (carouselRef.current) {
-      const scrollAmount = carouselRef.current.offsetWidth ; // Scroll half the width of the carousel to show the previous image
+      const scrollAmount = carouselRef.current.offsetWidth ; 
       carouselRef.current.scrollBy({
         left: -scrollAmount,
         behavior: 'smooth',
