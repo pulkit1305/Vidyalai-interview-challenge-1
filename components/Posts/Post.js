@@ -2,15 +2,7 @@ import PropTypes from 'prop-types';
 import React, { useRef } from 'react';
 import styled from '@emotion/styled';
 
-// const PostContainer = styled.div(() => ({
-//   width: '300px',
-//   margin: '10px',
-//   border: '1px solid #ccc',
-//   borderRadius: '5px',
-//   overflow: 'hidden',
-//   position: 'relative',
-// }));
-// ////////////////////////////////////////////
+
 const UserInfo = styled.div(() => ({
   display: 'flex',
   alignItems: 'center',
