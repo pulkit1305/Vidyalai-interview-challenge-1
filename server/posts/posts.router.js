@@ -1,29 +1,31 @@
 const express = require('express');
-const { fetchPosts } = require('./posts.service');
-const { fetchUserById } = require('../users/users.service');
+const { fetchPosts, fetchPhotos } = require('./posts.service');
 
 const router = express.Router();
 
 router.get('/', async (req, res) => {
-  const posts = await fetchPosts();
+  try {
+    const { start = 0, limit = 10 } = req.query;
+    const posts = await fetchPosts({ start, limit });
 
-  const postsWithImages = posts.reduce((acc, post) => {
-    // TODO use this route to fetch photos for each post
-    // axios.get(`https://jsonplaceholder.typicode.com/albums/${post.id}/photos`);
-    return [
-      ...acc,
-      {
-        ...post,
-        images: [
-          { url: 'https://picsum.photos/200/300' },
-          { url: 'https://picsum.photos/200/300' },
-          { url: 'https://picsum.photos/200/300' },
-        ],
-      },
-    ];
-  }, []);
+    // Fetch photos for each post's album
+    const postsWithImages = await Promise.all(
+      posts.map(async post => {
+        const photos = await fetchPhotos(post.id); // Assuming albumId = post.id
+        const images = photos.map(photo => ({ url: photo.url }));
 
-  res.json(postsWithImages);
+        return {
+          ...post,
+          images,
+        };
+      })
+    );
+
+    res.json(postsWithImages);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
 });
 
 module.exports = router;

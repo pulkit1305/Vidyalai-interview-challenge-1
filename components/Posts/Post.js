@@ -2,13 +2,47 @@ import PropTypes from 'prop-types';
 import React, { useRef } from 'react';
 import styled from '@emotion/styled';
 
-const PostContainer = styled.div(() => ({
-  width: '300px',
-  margin: '10px',
-  border: '1px solid #ccc',
-  borderRadius: '5px',
-  overflow: 'hidden',
+// const PostContainer = styled.div(() => ({
+//   width: '300px',
+//   margin: '10px',
+//   border: '1px solid #ccc',
+//   borderRadius: '5px',
+//   overflow: 'hidden',
+//   position: 'relative',
+// }));
+// ////////////////////////////////////////////
+const UserInfo = styled.div(() => ({
+  display: 'flex',
+  alignItems: 'center',
+  marginBottom: '10px',
 }));
+const UserInitials = styled.div(() => ({
+  backgroundColor: '#007bff',
+  color: '#fff',
+  borderRadius: '50%',
+  width: '40px',
+  height: '40px',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  fontSize: '18px',
+  marginRight: '10px',
+}));
+
+const PostContent = styled.div(() => ({
+  marginTop: '10px',
+}));
+
+const PostContainer = styled.div(() => ({
+  border: '1px solid #ddd',
+  borderRadius: '8px',
+  padding: '20px',
+  margin: '10px',
+  width: '300px',
+  backgroundColor: '#fff',
+  boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+}));
+
 
 const CarouselContainer = styled.div(() => ({
   position: 'relative',
@@ -23,6 +57,7 @@ const Carousel = styled.div(() => ({
     display: 'none',
   },
   position: 'relative',
+  scrollBehavior: 'smooth',
 }));
 
 const CarouselItem = styled.div(() => ({
@@ -46,13 +81,19 @@ const Content = styled.div(() => ({
 
 const Button = styled.button(() => ({
   position: 'absolute',
-  bottom: 0,
+  top: '50%',
+  transform: 'translateY(-50%)',
   backgroundColor: 'rgba(255, 255, 255, 0.5)',
   border: 'none',
   color: '#000',
   fontSize: '20px',
   cursor: 'pointer',
   height: '50px',
+  width: '50px',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  zIndex: 1,
 }));
 
 const PrevButton = styled(Button)`
@@ -65,11 +106,21 @@ const NextButton = styled(Button)`
 
 const Post = ({ post }) => {
   const carouselRef = useRef(null);
+  const { user, title, body, images } = post;
+  const getInitials = name => {
+    const names = name.split(' ');
+    if (names.length === 1) {
+      return names[0][0].toUpperCase();
+    }
+    return names[0][0].toUpperCase() + names[names.length - 1][0].toUpperCase();
+  };
+
 
   const handleNextClick = () => {
     if (carouselRef.current) {
+      const scrollAmount = carouselRef.current.offsetWidth; // Scroll half the width of the carousel to show the next image
       carouselRef.current.scrollBy({
-        left: 50,
+        left: scrollAmount,
         behavior: 'smooth',
       });
     }
@@ -77,8 +128,9 @@ const Post = ({ post }) => {
 
   const handlePrevClick = () => {
     if (carouselRef.current) {
+      const scrollAmount = carouselRef.current.offsetWidth ; // Scroll half the width of the carousel to show the previous image
       carouselRef.current.scrollBy({
-        left: -70,
+        left: -scrollAmount,
         behavior: 'smooth',
       });
     }
@@ -86,11 +138,18 @@ const Post = ({ post }) => {
 
   return (
     <PostContainer>
+       <UserInfo>
+        <UserInitials>{user ? getInitials(user.name) : '?'}</UserInitials>
+        <div>
+          <div>{user ? user.name : 'User Name'}</div>
+          <div>{user ? user.email : 'user@example.com'}</div>
+        </div>
+      </UserInfo>
       <CarouselContainer>
         <Carousel ref={carouselRef}>
-          {post.images.map((image, index) => (
+          {images.map((image, index) => (
             <CarouselItem key={index}>
-              <Image src={image.url} alt={post.title} />
+              <Image src={image.url} alt={title} />
             </CarouselItem>
           ))}
         </Carousel>
@@ -98,8 +157,8 @@ const Post = ({ post }) => {
         <NextButton onClick={handleNextClick}>&#10095;</NextButton>
       </CarouselContainer>
       <Content>
-        <h2>{post.title}</h2>
-        <p>{post.body}</p>
+        <h2>{title}</h2>
+        <p>{body}</p>
       </Content>
     </PostContainer>
   );
@@ -107,12 +166,18 @@ const Post = ({ post }) => {
 
 Post.propTypes = {
   post: PropTypes.shape({
-    content: PropTypes.any,
-    images: PropTypes.shape({
-      map: PropTypes.func,
-    }),
-    title: PropTypes.any,
-  }),
+    images: PropTypes.arrayOf(
+      PropTypes.shape({
+        url: PropTypes.string.isRequired,
+      })
+    ).isRequired,
+    title: PropTypes.string.isRequired,
+    body: PropTypes.string.isRequired,
+  }).isRequired,
 };
+
+
+
+
 
 export default Post;
